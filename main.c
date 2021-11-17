@@ -24,6 +24,7 @@ int main(void)
     AudioStream stream = LoadAudioStream(44100, 16, 1);
 
     // Buffer for the single cycle waveform we are synthesizing
+    // Size in bytes. 2bytes  * 512 = 1024bytes Unsigned long
     short *data = (short *)malloc(sizeof(short)*MAX_SAMPLES);
 
     // Frame buffer, describing the waveform when repeated over the course of a frame
@@ -32,10 +33,12 @@ int main(void)
     PlayAudioStream(stream);        // Start processing stream buffer (no data loaded currently)
 
     // Position read in to determine next frequency
-    Vector2 mousePosition = { -100.0f, -100.0f };
+
+    // POSIBLEMENTE QUITAR
+    // Vector2 mousePosition = { -100.0f, -100.0f };
 
     // Cycles per second (hz)
-    float frequency = 440.0f;
+    float frequency = 0.0f;
 
     // Previous value, used to test if sine needs to be rewritten, and to smoothly modulate frequency
     float oldFrequency = 1.0f;
@@ -46,7 +49,16 @@ int main(void)
     // Computed size in samples of the sine wave
     int waveLength = 1;
 
-    Vector2 position = { 0, 0 };
+    // Vector2 position = { 0, 0 };
+
+    // Pausar
+     bool pausa = false;
+
+    //  bucle de sonido infinito
+    bool loopInfinito  = false;
+
+    // Funcion original de seno
+    bool originalFunction = true;
 
     SetTargetFPS(30);               // Set our game to run at 30 frames-per-second
     //--------------------------------------------------------------------------------------
@@ -56,15 +68,73 @@ int main(void)
     {
         // Update
         //----------------------------------------------------------------------------------
+    
 
-        // Sample mouse input.
-        mousePosition = GetMousePosition();
+        if(IsKeyPressed(KEY_Q))
+            originalFunction = !originalFunction;
+        
+        if(IsKeyPressed(KEY_L))
+            loopInfinito = !loopInfinito;
+        if (!loopInfinito) frequency = 0;
 
-        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+
+        if (IsKeyPressed(KEY_P))
         {
-            float fp = (float)(mousePosition.y);
-            frequency = 40.0f + (float)(fp);
+            pausa = !pausa;
+            if (pausa) PauseAudioStream(stream);
+            else PlayAudioStream(stream);
         }
+
+         // Frecuencia para tecla DO
+            if (IsKeyDown(KEY_Z)) {
+               
+                frequency = 261.6f;
+            }
+            // Frecuencia para tecla DO #
+            if (IsKeyDown(KEY_S)) {
+                frequency = 277.2f;
+            }
+            //Frecuencia para tecla RE
+            if (IsKeyDown(KEY_X)) {
+                frequency = 293.6f;
+            }
+            //Frecuencia para tecla RE#
+            if (IsKeyDown(KEY_D))  {
+                frequency = 311.1f;
+            }
+            //Frecuencia para tecla MI
+            if (IsKeyDown(KEY_C)) {
+                frequency = 329.6f;
+            }
+            //Frecuencia para tecla FA
+            if (IsKeyDown(KEY_V)) {
+                frequency = 349.2f;
+            }
+            //Frecuencia para tecla FA#
+            if (IsKeyDown(KEY_G)) {
+                frequency = 370.0f;
+            }
+            //Frecuencia para tecla SOL
+            if (IsKeyDown(KEY_B)) {
+                frequency = 392.0f;
+            }
+            //Frecuencia para tecla SOL#
+            if (IsKeyDown(KEY_H)) {
+                frequency = 415.3f;
+            }
+            //Frecuencia para tecla LA
+            if (IsKeyDown(KEY_N)) {
+                frequency = 440.0f;
+            }
+            //Frecuencia para tecla LA#
+            if (IsKeyDown(KEY_J)) {
+                frequency = 466.2f;
+            }
+            //Frecuencia para tecla SI
+            if (IsKeyDown(KEY_M)) {
+                frequency = 493.2f;
+            }
+            
 
         // Rewrite the sine wave.
         // Compute two cycles to allow the buffer padding, simplifying any modulation, resampling, etc.
@@ -79,7 +149,14 @@ int main(void)
             // Write sine wave.
             for (int i = 0; i < waveLength*2; i++)
             {
-                data[i] = (short)(sinf(((2*PI*(float)i/waveLength)))*32000);
+                if(originalFunction){
+                    data[i] = (short)(sinf(((2*PI*(float)i/waveLength)))*32000);
+                }else {
+
+                data[i] = (short)(sinf(((2*PI*(float)i/waveLength)))*32000)+(short)(sinf(((2*PI*(float)i/waveLength)))*32000);
+
+                 }
+
             }
 
             // Scale read cursor's position to minimize transition artifacts
@@ -123,18 +200,12 @@ int main(void)
 
             ClearBackground(RAYWHITE);
 
-            DrawText(TextFormat("sine frequency: %i",(int)frequency), GetScreenWidth() - 220, 10, 20, RED);
-            DrawText("click mouse button to change frequency", 10, 10, 20, DARKGRAY);
-
-            // Draw the current buffer state proportionate to the screen
-            for (int i = 0; i < screenWidth; i++)
-            {
-                position.x = (float)i;
-                position.y = 250 + 50*data[i*MAX_SAMPLES/screenWidth]/32000.0f;
-
-                DrawPixelV(position, RED);
-            }
-
+            DrawText(TextFormat("Frecuencia del seno: %i",(int)frequency), GetScreenWidth() - 300, 10, 20, DARKGRAY);
+            DrawText("Presionar de z a m escala normal.", 10, 10, 20, DARKGRAY);
+            DrawText("Presionar q para cambiar de funcion.", 10, 30, 20, DARKGRAY);
+            DrawText("Presionar p para pausa.", 10, 50, 20, DARKGRAY);
+            DrawText("Presionar l para bucle de sonido.", 10, 70, 20, DARKGRAY);
+           
         EndDrawing();
         //----------------------------------------------------------------------------------
     }
