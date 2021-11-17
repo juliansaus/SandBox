@@ -1,11 +1,20 @@
-#include "include/raylib.h"
+
+#include <raylib.h>
+
 
 #include <stdlib.h>         // Required for: malloc(), free()
 #include <math.h>           // Required for: sinf()
 #include <string.h>         // Required for: memcpy()
 
+
+
 #define MAX_SAMPLES               512
 #define MAX_SAMPLES_PER_UPDATE   4096
+
+#include <raylib.h>
+
+#define RAYGUI_IMPLEMENTATION
+#include "extras/raygui.h"                 // Required for GUI controls
 
 int main(void)
 {
@@ -51,15 +60,33 @@ int main(void)
 
     // Vector2 position = { 0, 0 };
 
+   
+
+    float perilla1= 50.0f;
+    // float perilla2= 50.0f;
+    // float perilla3= 50.0f;
+    // float perilla4= 50.0f;
+    // float perilla5= 50.0f;
+
+
+
+    // Vector2 center = {(GetScreenWidth() - 300)/2.0f, GetScreenHeight()/2.0f };
+
+    float innerRadius = 80.0f;
+    float outerRadius = 190.0f;
+
+
     // Pausar
-     bool pausa = false;
+     bool play = true;
 
     //  bucle de sonido infinito
     bool loopInfinito  = false;
 
     // Funcion original de seno
-    bool originalFunction = true;
+    bool originalFunction = true;\
 
+
+    
     SetTargetFPS(30);               // Set our game to run at 30 frames-per-second
     //--------------------------------------------------------------------------------------
 
@@ -70,20 +97,22 @@ int main(void)
         //----------------------------------------------------------------------------------
     
 
-        if(IsKeyPressed(KEY_Q))
-            originalFunction = !originalFunction;
+    //    if (IsKeyPressed(KEY_P))
+    //         play = !play;
+    //     if(IsKeyPressed(KEY_L))
+    //         loopInfinito = !loopInfinito;
+    //     if(IsKeyPressed(KEY_Q))
+    //         originalFunction = !originalFunction;
+
+
+        // if (!loopInfinito) frequency = 0;
+
+        if (play==true) PlayAudioStream(stream);
         
-        if(IsKeyPressed(KEY_L))
-            loopInfinito = !loopInfinito;
-        if (!loopInfinito) frequency = 0;
+        
 
-
-        if (IsKeyPressed(KEY_P))
-        {
-            pausa = !pausa;
-            if (pausa) PauseAudioStream(stream);
-            else PlayAudioStream(stream);
-        }
+        // if (play==true) PauseAudioStream(stream);
+        //     else PlayAudioStream(stream);
 
          // Frecuencia para tecla DO
             if (IsKeyDown(KEY_Z)) {
@@ -205,7 +234,37 @@ int main(void)
             DrawText("Presionar q para cambiar de funcion.", 10, 30, 20, DARKGRAY);
             DrawText("Presionar p para pausa.", 10, 50, 20, DARKGRAY);
             DrawText("Presionar l para bucle de sonido.", 10, 70, 20, DARKGRAY);
-           
+
+            // perilla1 = GuiSliderBar((Rectangle){ 600, 140, 120, 20 }, "Perilla1", NULL, perilla1, 0, 100);
+
+
+
+        
+
+            // DrawLine(500, 0, 500, GetScreenHeight(), Fade(LIGHTGRAY, 0.6f));
+            // DrawRectangle(500, 0, GetScreenWidth() - 500, GetScreenHeight(), Fade(LIGHTGRAY, 0.3f));
+
+            
+
+
+
+
+        // Draw GUI controls
+            //------------------------------------------------------------------------------
+            
+
+            innerRadius = GuiSliderBar((Rectangle){ 600, 140, 120, 20 }, "InnerRadius", NULL, innerRadius, 0, 100);
+            outerRadius = GuiSliderBar((Rectangle){ 600, 170, 120, 20 }, "OuterRadius", NULL, outerRadius, 0, 200);
+
+
+            // play = GuiCheckBox((Rectangle){ 600, 320, 20, 20 }, "Play", play);
+
+            // loopInfinito = GuiCheckBox((Rectangle){ 600, 350, 20, 20 }, "Musica Continua", loopInfinito);
+            // originalFunction = GuiCheckBox((Rectangle){ 600, 380, 20, 20 }, "Sin Original", originalFunction);
+            //------------------------------------------------------------------------------
+
+            
+
         EndDrawing();
         //----------------------------------------------------------------------------------
     }
