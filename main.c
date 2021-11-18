@@ -8,8 +8,8 @@
 
 
 
-#define MAX_SAMPLES               512
-#define MAX_SAMPLES_PER_UPDATE   4096
+#define MAX_MUESTRAS               512
+#define MAX_MUESTRAS_POR_FRAME   4096
 
 #include <raylib.h>
 
@@ -20,37 +20,32 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    const int screenWidth = 800;
-    const int screenHeight = 450;
+    const int pantallaAncho = 800;
+    const int pantallaAlto = 450;
 
-    InitWindow(screenWidth, screenHeight, "raylib [audio] example - raw audio streaming");
+    InitWindow(pantallaAncho, pantallaAlto, "Sintetizador de audio");
 
     InitAudioDevice();              // Initialize audio device
 
-    SetAudioStreamBufferSizeDefault(MAX_SAMPLES_PER_UPDATE);
+    SetAudioStreamBufferSizeDefault(MAX_MUESTRAS_POR_FRAME);
 
     // Init raw audio stream (sample rate: 22050, sample size: 16bit-short, channels: 1-mono)
     AudioStream stream = LoadAudioStream(44100, 16, 1);
 
     // Buffer for the single cycle waveform we are synthesizing
     // Size in bytes. 2bytes  * 512 = 1024bytes Unsigned long
-    short *data = (short *)malloc(sizeof(short)*MAX_SAMPLES);
+    short *bufferUnCiclo = (short *)malloc(sizeof(short)*MAX_MUESTRAS);
 
     // Frame buffer, describing the waveform when repeated over the course of a frame
-    short *writeBuf = (short *)malloc(sizeof(short)*MAX_SAMPLES_PER_UPDATE);
+    short *bufferPorFrame = (short *)malloc(sizeof(short)*MAX_MUESTRAS_POR_FRAME);
 
-    PlayAudioStream(stream);        // Start processing stream buffer (no data loaded currently)
-
-    // Position read in to determine next frequency
-
-    // POSIBLEMENTE QUITAR
-    // Vector2 mousePosition = { -100.0f, -100.0f };
-
+    PlayAudioStream(stream);        // Start processing stream buffer (no bufferUnCiclo loaded currently)
+  
     // Cycles per second (hz)
-    float frequency = 0.0f;
+    float frecuencia = 0.0f;
 
-    // Previous value, used to test if sine needs to be rewritten, and to smoothly modulate frequency
-    float oldFrequency = 1.0f;
+    // Previous value, used to test if sine needs to be rewritten, and to smoothly modulate frecuencia
+    float viejaFrecuencia = 1.0f;
 
     // Cursor to read and copy the samples of the sine wave buffer
     int readCursor = 0;
@@ -63,27 +58,14 @@ int main(void)
    
 
     float perilla1= 50.0f;
-    // float perilla2= 50.0f;
-    // float perilla3= 50.0f;
-    // float perilla4= 50.0f;
-    // float perilla5= 50.0f;
+    float perilla2= 50.0f;
+    float perilla3= 50.0f;
+    float perilla4= 50.0f;
+    float perilla5= 50.0f;
 
-
-
-    // Vector2 center = {(GetScreenWidth() - 300)/2.0f, GetScreenHeight()/2.0f };
-
-    float innerRadius = 80.0f;
-    float outerRadius = 190.0f;
-
-
-    // Pausar
-     bool play = true;
-
-    //  bucle de sonido infinito
-    bool loopInfinito  = false;
 
     // Funcion original de seno
-    bool originalFunction = true;\
+    bool originalFunction = true;
 
 
     
@@ -95,94 +77,84 @@ int main(void)
     {
         // Update
         //----------------------------------------------------------------------------------
-    
 
-    //    if (IsKeyPressed(KEY_P))
-    //         play = !play;
-    //     if(IsKeyPressed(KEY_L))
-    //         loopInfinito = !loopInfinito;
-    //     if(IsKeyPressed(KEY_Q))
-    //         originalFunction = !originalFunction;
-
-
-        // if (!loopInfinito) frequency = 0;
-
-        if (play==true) PlayAudioStream(stream);
         
+        frecuencia = 0;
         
 
-        // if (play==true) PauseAudioStream(stream);
-        //     else PlayAudioStream(stream);
-
-         // Frecuencia para tecla DO
+         // frecuencia para tecla DO
             if (IsKeyDown(KEY_Z)) {
                
-                frequency = 261.6f;
+                frecuencia = 261.6f;
+
             }
-            // Frecuencia para tecla DO #
+            // frecuencia para tecla DO #
             if (IsKeyDown(KEY_S)) {
-                frequency = 277.2f;
+                frecuencia = 277.2f;
             }
-            //Frecuencia para tecla RE
+            //frecuencia para tecla RE
             if (IsKeyDown(KEY_X)) {
-                frequency = 293.6f;
+                frecuencia = 293.6f;
             }
-            //Frecuencia para tecla RE#
+            //frecuencia para tecla RE#
             if (IsKeyDown(KEY_D))  {
-                frequency = 311.1f;
+                frecuencia = 311.1f;
             }
-            //Frecuencia para tecla MI
+            //frecuencia para tecla MI
             if (IsKeyDown(KEY_C)) {
-                frequency = 329.6f;
+                frecuencia = 329.6f;
             }
-            //Frecuencia para tecla FA
+            //frecuencia para tecla FA
             if (IsKeyDown(KEY_V)) {
-                frequency = 349.2f;
+                frecuencia = 349.2f;
             }
-            //Frecuencia para tecla FA#
+            //frecuencia para tecla FA#
             if (IsKeyDown(KEY_G)) {
-                frequency = 370.0f;
+                frecuencia = 370.0f;
             }
-            //Frecuencia para tecla SOL
+            //frecuencia para tecla SOL
             if (IsKeyDown(KEY_B)) {
-                frequency = 392.0f;
+                frecuencia = 392.0f;
             }
-            //Frecuencia para tecla SOL#
+            //frecuencia para tecla SOL#
             if (IsKeyDown(KEY_H)) {
-                frequency = 415.3f;
+                frecuencia = 415.3f;
             }
-            //Frecuencia para tecla LA
+            //frecuencia para tecla LA
             if (IsKeyDown(KEY_N)) {
-                frequency = 440.0f;
+                frecuencia = 440.0f;
             }
-            //Frecuencia para tecla LA#
+            //frecuencia para tecla LA#
             if (IsKeyDown(KEY_J)) {
-                frequency = 466.2f;
+                frecuencia = 466.2f;
             }
-            //Frecuencia para tecla SI
+            //frecuencia para tecla SI
             if (IsKeyDown(KEY_M)) {
-                frequency = 493.2f;
+                frecuencia = 493.2f;
             }
             
 
         // Rewrite the sine wave.
         // Compute two cycles to allow the buffer padding, simplifying any modulation, resampling, etc.
-        if (frequency != oldFrequency)
+        if (frecuencia != viejaFrecuencia)
         {
             // Compute wavelength. Limit size in both directions.
-            int oldWavelength = waveLength;
-            waveLength = (int)(22050/frequency);
-            if (waveLength > MAX_SAMPLES/2) waveLength = MAX_SAMPLES/2;
-            if (waveLength < 1) waveLength = 1;
 
+            printf("wavelength = %i\n",waveLength);
+
+            int oldWavelength = waveLength;
+            waveLength = (int)(22050/frecuencia);
+            if (waveLength > MAX_MUESTRAS/2) waveLength = MAX_MUESTRAS/2;
+            if (waveLength < 1) waveLength = 1;
+            
             // Write sine wave.
             for (int i = 0; i < waveLength*2; i++)
             {
                 if(originalFunction){
-                    data[i] = (short)(sinf(((2*PI*(float)i/waveLength)))*32000);
+                    bufferUnCiclo[i] = (short)(sinf(((2*PI*(float)i/waveLength)))*32000);
                 }else {
 
-                data[i] = (short)(sinf(((2*PI*(float)i/waveLength)))*32000)+(short)(sinf(((2*PI*(float)i/waveLength)))*32000);
+                bufferUnCiclo[i] = (short)(sinf(((2*PI*(float)i/waveLength)))*32000)+(short)(sinf(((2*PI*(float)i/waveLength)))*32000);
 
                  }
 
@@ -190,7 +162,8 @@ int main(void)
 
             // Scale read cursor's position to minimize transition artifacts
             readCursor = (int)(readCursor * ((float)waveLength / (float)oldWavelength));
-            oldFrequency = frequency;
+            
+            viejaFrecuencia = frecuencia;
         }
 
         // Refill audio stream if required
@@ -199,10 +172,10 @@ int main(void)
             // Synthesize a buffer that is exactly the requested size
             int writeCursor = 0;
 
-            while (writeCursor < MAX_SAMPLES_PER_UPDATE)
+            while (writeCursor < MAX_MUESTRAS_POR_FRAME)
             {
                 // Start by trying to write the whole chunk at once
-                int writeLength = MAX_SAMPLES_PER_UPDATE-writeCursor;
+                int writeLength = MAX_MUESTRAS_POR_FRAME-writeCursor;
 
                 // Limit to the maximum readable size
                 int readLength = waveLength-readCursor;
@@ -210,7 +183,7 @@ int main(void)
                 if (writeLength > readLength) writeLength = readLength;
 
                 // Write the slice
-                memcpy(writeBuf + writeCursor, data + readCursor, writeLength*sizeof(short));
+                memcpy(bufferPorFrame + writeCursor, bufferUnCiclo + readCursor, writeLength*sizeof(short));
 
                 // Update cursors and loop audio
                 readCursor = (readCursor + writeLength) % waveLength;
@@ -219,7 +192,7 @@ int main(void)
             }
 
             // Copy finished frame to audio stream
-            UpdateAudioStream(stream, writeBuf, MAX_SAMPLES_PER_UPDATE);
+            UpdateAudioStream(stream, bufferPorFrame, MAX_MUESTRAS_POR_FRAME);
         }
         //----------------------------------------------------------------------------------
 
@@ -229,38 +202,23 @@ int main(void)
 
             ClearBackground(RAYWHITE);
 
-            DrawText(TextFormat("Frecuencia del seno: %i",(int)frequency), GetScreenWidth() - 300, 10, 20, DARKGRAY);
+            DrawText(TextFormat("frecuencia del seno: %i",(int)frecuencia), GetScreenWidth() - 300, 10, 20, DARKGRAY);
             DrawText("Presionar de z a m escala normal.", 10, 10, 20, DARKGRAY);
-            DrawText("Presionar q para cambiar de funcion.", 10, 30, 20, DARKGRAY);
-            DrawText("Presionar p para pausa.", 10, 50, 20, DARKGRAY);
-            DrawText("Presionar l para bucle de sonido.", 10, 70, 20, DARKGRAY);
+            // DrawText("Presionar q para cambiar de funcion.", 10, 30, 20, DARKGRAY);
+            // DrawText("Presionar p para pausa.", 10, 50, 20, DARKGRAY);
+            // DrawText("Presionar l para bucle de sonido.", 10, 70, 20, DARKGRAY);
 
-            // perilla1 = GuiSliderBar((Rectangle){ 600, 140, 120, 20 }, "Perilla1", NULL, perilla1, 0, 100);
-
-
-
-        
-
-            // DrawLine(500, 0, 500, GetScreenHeight(), Fade(LIGHTGRAY, 0.6f));
-            // DrawRectangle(500, 0, GetScreenWidth() - 500, GetScreenHeight(), Fade(LIGHTGRAY, 0.3f));
-
-            
+            perilla1 = GuiSliderBar((Rectangle){ 600, 60, 120, 20 }, "1", NULL, perilla1, 0, 100);
+            perilla2 = GuiSliderBar((Rectangle){ 600, 100, 120, 20 }, "2", NULL, perilla2, 0, 100);
+            perilla3 = GuiSliderBar((Rectangle){ 600, 140, 120, 20 }, "3", NULL, perilla3, 0, 100);
+            perilla4 = GuiSliderBar((Rectangle){ 600, 180, 120, 20 }, "4", NULL, perilla4, 0, 100);
+            perilla5 = GuiSliderBar((Rectangle){ 600, 220, 120, 20 }, "5", NULL, perilla5, 0, 100);
 
 
+            // innerRadius = GuiSliderBar((Rectangle){ 600, 140, 120, 20 }, "InnerRadius", NULL, innerRadius, 0, 100);
+            // outerRadius = GuiSliderBar((Rectangle){ 600, 170, 120, 20 }, "OuterRadius", NULL, outerRadius, 0, 200);
 
-
-        // Draw GUI controls
-            //------------------------------------------------------------------------------
-            
-
-            innerRadius = GuiSliderBar((Rectangle){ 600, 140, 120, 20 }, "InnerRadius", NULL, innerRadius, 0, 100);
-            outerRadius = GuiSliderBar((Rectangle){ 600, 170, 120, 20 }, "OuterRadius", NULL, outerRadius, 0, 200);
-
-
-            // play = GuiCheckBox((Rectangle){ 600, 320, 20, 20 }, "Play", play);
-
-            // loopInfinito = GuiCheckBox((Rectangle){ 600, 350, 20, 20 }, "Musica Continua", loopInfinito);
-            // originalFunction = GuiCheckBox((Rectangle){ 600, 380, 20, 20 }, "Sin Original", originalFunction);
+            originalFunction = GuiCheckBox((Rectangle){ 600, 380, 20, 20 }, "Sin Original", originalFunction);
             //------------------------------------------------------------------------------
 
             
@@ -271,8 +229,8 @@ int main(void)
 
     // De-Initialization
     //--------------------------------------------------------------------------------------
-    free(data);                 // Unload sine wave data
-    free(writeBuf);             // Unload write buffer
+    free(bufferUnCiclo);                 // Unload sine wave bufferUnCiclo
+    free(bufferPorFrame);             // Unload write buffer
 
     UnloadAudioStream(stream);   // Close raw audio stream and delete buffers from RAM
     CloseAudioDevice();         // Close audio device (music streaming is automatically stopped)
