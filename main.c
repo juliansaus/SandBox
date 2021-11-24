@@ -1,4 +1,3 @@
-
 #include <raylib.h>
 
 
@@ -66,6 +65,15 @@ int main(void)
 
     // Funcion original de seno
     bool originalFunction = true;
+    
+    // Funcion triangular
+    bool TriangularFunction = true;
+    
+    // Funcion cuadrática
+    bool CuadraticFunction = true;
+    
+    // Funcion sierra
+    bool SawFunction = true;
 
 
     
@@ -219,6 +227,12 @@ int main(void)
             // outerRadius = GuiSliderBar((Rectangle){ 600, 170, 120, 20 }, "OuterRadius", NULL, outerRadius, 0, 200);
 
             originalFunction = GuiCheckBox((Rectangle){ 600, 380, 20, 20 }, "Sin Original", originalFunction);
+        
+            TriangularFunction = GuiCheckBox((Rectangle){ 500, 380, 20, 20 }, "Triangular", TriangularFunction);
+        
+            CuadraticFunction = GuiCheckBox((Rectangle){ 400, 380, 20, 20 }, "Cuadrática", CuadraticFunction);
+        
+            SawFunction = GuiCheckBox((Rectangle){ 300, 380, 20, 20 }, "Sierra", SawFunction);
             //------------------------------------------------------------------------------
 
             
